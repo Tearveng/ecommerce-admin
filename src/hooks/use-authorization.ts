@@ -4,6 +4,7 @@ const permissions = {
   orders: {
     canChangeStatus: ["super_admin", "admin", "cashier"],
     canPrint: ["super_admin", "admin", "cashier"],
+    canCreate: ["super_admin", "admin"],
   },
   categories: {
     canCreate: ["super_admin", "admin"],
@@ -42,7 +43,7 @@ export function useAuthorization() {
 
   const hasPermission = <F extends Feature>(
     feature: F,
-    action: keyof PermissionMap[F]
+    action: keyof PermissionMap[F],
   ): boolean => {
     if (isLoading || !profile || !profile.role) return false;
 

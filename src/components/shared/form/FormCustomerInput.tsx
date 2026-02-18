@@ -41,7 +41,7 @@ const FormCategoryInput = forwardRef(function FormCategoryInputRender<
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ["categories", "dropdown"],
+    queryKey: ["customers", "dropdown"],
     queryFn: () => fetchCategoriesDropdown(createBrowserClient() as any),
     staleTime: 5 * 60 * 1000,
   });

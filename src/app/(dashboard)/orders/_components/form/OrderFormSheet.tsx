@@ -30,7 +30,7 @@ import {
 } from "@/components/shared/form";
 import { FormSubmitButton } from "@/components/shared/form/FormSubmitButton";
 
-import { productFormSchema, ProductFormData } from "./schema";
+import { OrderFormData, orderFormSchema } from "./schema";
 import { objectToFormData } from "@/helpers/objectToFormData";
 import { ProductServerActionResponse } from "@/types/server-action";
 
@@ -49,13 +49,13 @@ type AddProductFormProps = BaseProductFormProps & {
 };
 
 type EditProductFormProps = BaseProductFormProps & {
-  initialData: Partial<ProductFormData>;
+  initialData: Partial<OrderFormData>;
   previewImage: string;
 };
 
 type ProductFormProps = AddProductFormProps | EditProductFormProps;
 
-export default function ProductFormSheet({
+export default function OrderFormSheet({
   title,
   description,
   submitButtonText,
@@ -72,19 +72,16 @@ export default function ProductFormSheet({
   const imageDropzoneRef = useRef<HTMLDivElement>(null);
   const categoryRef = useRef<HTMLButtonElement>(null);
 
-  const form = useForm<ProductFormData>({
-    resolver: zodResolver(productFormSchema),
+  const form = useForm<OrderFormData>({
+    resolver: zodResolver(orderFormSchema),
     defaultValues: {
-      name: "",
-      description: "",
-      image: undefined,
-      sku: "",
-      category: "",
-      costPrice: 0,
-      salesPrice: 0,
-      stock: 0,
-      minStockThreshold: 0,
-      slug: "",
+      invoiceNumber: "",
+      totalAmount: 0,
+      customer: "",
+      coupon: "",
+      status: "",
+      paymentMethod: "",
+      shipping: "",
       ...initialData,
     },
   });
@@ -93,7 +90,7 @@ export default function ProductFormSheet({
     form.reset(initialData);
   }, [form, initialData]);
 
-  const onSubmit = (data: ProductFormData) => {
+  const onSubmit = (data: OrderFormData) => {
     const formData = objectToFormData(data);
 
     startTransition(async () => {
@@ -101,13 +98,13 @@ export default function ProductFormSheet({
 
       if ("validationErrors" in result) {
         Object.keys(result.validationErrors).forEach((key) => {
-          form.setError(key as keyof ProductFormData, {
+          form.setError(key as keyof OrderFormData, {
             message: result.validationErrors![key],
           });
         });
 
         form.setFocus(
-          Object.keys(result.validationErrors)[0] as keyof ProductFormData,
+          Object.keys(result.validationErrors)[0] as keyof OrderFormData,
         );
       } else if ("dbError" in result) {
         toast.error(result.dbError);
@@ -123,7 +120,7 @@ export default function ProductFormSheet({
     });
   };
 
-  const onInvalid = (errors: FieldErrors<ProductFormData>) => {
+  const onInvalid = (errors: FieldErrors<OrderFormData>) => {
     if (errors.image) {
       imageDropzoneRef.current?.focus();
     } else if (errors.category) {
@@ -156,22 +153,29 @@ export default function ProductFormSheet({
                 >
                   <FormTextInput
                     control={form.control}
-                    name="name"
-                    label="Product Name"
-                    placeholder="Product Name / Title"
+                    name="invoiceNumber"
+                    label="Invoice No"
+                    placeholder="Invoice No"
                   />
 
                   <FormTextarea
                     control={form.control}
-                    name="description"
-                    label="Product Description"
-                    placeholder="Product Description"
+                    name="totalAmount"
+                    label="Total amount"
+                    placeholder="Total amount"
+                  />
+
+                  <FormTextarea
+                    control={form.control}
+                    name="customer"
+                    label="Customer"
+                    placeholder="Customer"
                   />
 
                   <FormImageInput
                     control={form.control}
-                    name="image"
-                    label="Product Image"
+                    name="customer"
+                    label="Customer"
                     previewImage={previewImage}
                     ref={imageDropzoneRef}
                   />

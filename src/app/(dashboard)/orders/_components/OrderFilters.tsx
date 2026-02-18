@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { DownloadCloud, Loader2 } from "lucide-react";
+import { DownloadCloud, Loader2, Plus } from "lucide-react";
 
 import {
   Select,
@@ -20,8 +20,13 @@ import { DatePicker } from "@/components/shared/DatePicker";
 
 import { exportAsCSV } from "@/helpers/exportData";
 import { exportOrders } from "@/actions/orders/exportOrders";
+import { useAuthorization } from "@/hooks/use-authorization";
+import ProductFormSheet from "../../products/_components/form/ProductFormSheet";
+import { SheetTrigger } from "@/components/ui/sheet";
+import { addProduct } from "@/actions/products/addProduct";
 
 export default function OrderFilters() {
+  const { hasPermission } = useAuthorization();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
@@ -90,7 +95,7 @@ export default function OrderFilters() {
           <Input
             type="search"
             placeholder="Search by customer name"
-            className="h-12 md:basis-1/4"
+            className="h-12 md:basis-[25%]"
             value={filters.search}
             onChange={(e) => setFilters({ ...filters, search: e.target.value })}
           />
@@ -99,7 +104,7 @@ export default function OrderFilters() {
             value={filters.status}
             onValueChange={(value) => setFilters({ ...filters, status: value })}
           >
-            <SelectTrigger className="capitalize md:basis-1/4">
+            <SelectTrigger className="capitalize md:basis-[25%]">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
 
@@ -116,7 +121,7 @@ export default function OrderFilters() {
             value={filters.method}
             onValueChange={(value) => setFilters({ ...filters, method: value })}
           >
-            <SelectTrigger className="capitalize md:basis-1/4">
+            <SelectTrigger className="capitalize md:basis-[20%]">
               <SelectValue placeholder="Method" />
             </SelectTrigger>
 
@@ -128,19 +133,42 @@ export default function OrderFilters() {
             </SelectContent>
           </Select>
 
-          <Button
-            type="button"
-            onClick={handleOrdersDownload}
-            disabled={isPending}
-            className="h-12 flex-shrink-0 md:basis-1/4"
-          >
-            Download{" "}
-            {isPending ? (
-              <Loader2 className="ml-2 size-4 animate-spin" />
-            ) : (
-              <DownloadCloud className="ml-2 size-4" />
+          <div className="flex flex-wrap sm:flex-nowrap gap-4 md:basis-[30%]">
+            <Button
+              type="button"
+              size="lg"
+              onClick={handleOrdersDownload}
+              disabled={isPending}
+              className="h-12 flex-grow"
+            >
+              Download{" "}
+              {isPending ? (
+                <Loader2 className="ml-2 size-4 animate-spin" />
+              ) : (
+                <DownloadCloud className="ml-2 size-4" />
+              )}
+            </Button>
+
+            {hasPermission("products", "canCreate") && (
+              <ProductFormSheet
+                title="Add Product"
+                description="Add necessary product information here"
+                submitButtonText="Add Product"
+                actionVerb="added"
+                action={addProduct}
+              >
+                <SheetTrigger asChild>
+                  <Button
+                    variant="default"
+                    size="lg"
+                    className="h-12 flex-grow"
+                  >
+                    <Plus className="mr-2 size-4" /> Make Order
+                  </Button>
+                </SheetTrigger>
+              </ProductFormSheet>
             )}
-          </Button>
+          </div>
         </div>
 
         <div className="flex flex-col md:flex-row md:items-end gap-4 lg:gap-6">

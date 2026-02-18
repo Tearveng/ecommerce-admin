@@ -8,7 +8,7 @@ type SlugifyOptions<T> = {
 
 export function generateSlugField<T extends FieldValues>(
   form: UseFormReturn<T>,
-  options: SlugifyOptions<T>
+  options: SlugifyOptions<T>,
 ) {
   const { sourceField, targetField } = options;
 
@@ -20,6 +20,8 @@ export function generateSlugField<T extends FieldValues>(
       strict: true,
       locale: "en",
     }) as PathValue<T, Path<T>>;
+
+    console.log("generatedSlug", generatedSlug);
 
     form.setValue(targetField, generatedSlug, {
       shouldValidate: true,

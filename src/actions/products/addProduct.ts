@@ -8,7 +8,7 @@ import { formatValidationErrors } from "@/helpers/formatValidationErrors";
 import { ProductServerActionResponse } from "@/types/server-action";
 
 export async function addProduct(
-  formData: FormData
+  formData: FormData,
 ): Promise<ProductServerActionResponse> {
   const supabase = createServerActionClient();
 
@@ -28,7 +28,7 @@ export async function addProduct(
   if (!parsedData.success) {
     return {
       validationErrors: formatValidationErrors(
-        parsedData.error.flatten().fieldErrors
+        parsedData.error.flatten().fieldErrors,
       ),
     };
   }
@@ -73,7 +73,7 @@ export async function addProduct(
       sku: productData.sku,
       published: false,
       image_url: imageUrl as string,
-    })
+    } as any)
     .select()
     .single();
 
