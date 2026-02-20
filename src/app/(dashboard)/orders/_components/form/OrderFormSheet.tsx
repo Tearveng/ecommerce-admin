@@ -33,6 +33,10 @@ import { FormSubmitButton } from "@/components/shared/form/FormSubmitButton";
 import { OrderFormData, orderFormSchema } from "./schema";
 import { objectToFormData } from "@/helpers/objectToFormData";
 import { ProductServerActionResponse } from "@/types/server-action";
+import { Autocomplete } from "@/components/ui/auto-complete";
+import FormCustomerInput from "@/components/shared/form/FormCustomerInput";
+import FormPaymentInput from "@/components/shared/form/FormPaymentInput";
+import FormStatusInput from "@/components/shared/form/FormDeliveryInput";
 
 type BaseProductFormProps = {
   title: string;
@@ -81,7 +85,7 @@ export default function OrderFormSheet({
       coupon: "",
       status: "",
       paymentMethod: "",
-      shipping: "",
+      shipping: 0,
       ...initialData,
     },
   });
@@ -121,11 +125,13 @@ export default function OrderFormSheet({
   };
 
   const onInvalid = (errors: FieldErrors<OrderFormData>) => {
-    if (errors.image) {
-      imageDropzoneRef.current?.focus();
-    } else if (errors.category) {
-      categoryRef.current?.focus();
-    }
+    // if (errors.image) {
+    //   imageDropzoneRef.current?.focus();
+    // } else if (errors.category) {
+    //   categoryRef.current?.focus();
+    // }
+
+    return;
   };
 
   return (
@@ -158,29 +164,47 @@ export default function OrderFormSheet({
                     placeholder="Invoice No"
                   />
 
-                  <FormTextarea
+                  <FormPriceInput
                     control={form.control}
                     name="totalAmount"
                     label="Total amount"
                     placeholder="Total amount"
                   />
 
-                  <FormTextarea
+                  <FormCustomerInput
                     control={form.control}
                     name="customer"
                     label="Customer"
-                    placeholder="Customer"
                   />
 
-                  <FormImageInput
+                  <FormPriceInput
+                    control={form.control}
+                    name="shipping"
+                    label="Shipping cost"
+                    placeholder="Shipping cost"
+                  />
+
+                  <FormPaymentInput
+                    control={form.control}
+                    name="paymentMethod"
+                    label="Payment method"
+                  />
+
+                  <FormStatusInput
+                    control={form.control}
+                    name="status"
+                    label="Status"
+                  />
+
+                  {/* <FormImageInput
                     control={form.control}
                     name="customer"
                     label="Customer"
                     previewImage={previewImage}
                     ref={imageDropzoneRef}
-                  />
+                  /> */}
 
-                  <FormTextInput
+                  {/* <FormTextInput
                     control={form.control}
                     name="sku"
                     label="Product SKU"
@@ -232,7 +256,7 @@ export default function OrderFormSheet({
                     label="Product Slug"
                     placeholder="Product Slug"
                     generateSlugFrom="name"
-                  />
+                  /> */}
                 </div>
               </FormSheetBody>
 

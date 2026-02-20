@@ -6,7 +6,7 @@ import { createServerActionClient } from "@/lib/supabase/server-action";
 import { ServerActionResponse } from "@/types/server-action";
 
 export async function deleteCategories(
-  categoryIds: string[]
+  categoryIds: string[],
 ): Promise<ServerActionResponse> {
   const supabase = createServerActionClient();
 
@@ -22,7 +22,7 @@ export async function deleteCategories(
 
   const imageFileNames =
     categoriesData
-      ?.map((category) => category.image_url)
+      ?.map((category: any) => category.image_url)
       .filter(Boolean)
       .map((url) => `categories/${url.split("/").pop()}`) ?? [];
 

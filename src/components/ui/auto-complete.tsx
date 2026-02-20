@@ -18,22 +18,26 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
-type Option = {
+export type ICustomersOption = {
   value: string;
   label: string;
 };
 
 interface AutocompleteProps {
-  options: Option[];
+  options: ICustomersOption[];
   value?: string;
+  search?: string;
   onChange?: (value: string) => void;
   placeholder?: string;
+  onSearchChange?: (value: string) => void;
 }
 
 export function Autocomplete({
   options,
   value,
   onChange,
+  search,
+  onSearchChange,
   placeholder = "Select option...",
 }: AutocompleteProps) {
   const [open, setOpen] = React.useState(false);
@@ -55,7 +59,12 @@ export function Autocomplete({
       </PopoverTrigger>
       <PopoverContent className="w-full p-0">
         <Command>
-          <CommandInput placeholder="Search..." />
+          <CommandInput
+            className="bg-transparent border-0 focus:ring-0 focus:outline-none"
+            placeholder="Search..."
+            value={search}
+            onValueChange={onSearchChange}
+          />
           <CommandEmpty>No results found.</CommandEmpty>
           <CommandGroup>
             {options.map((option) => (

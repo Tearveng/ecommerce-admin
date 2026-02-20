@@ -1,6 +1,6 @@
 "use client";
 
-import { forwardRef, Ref } from "react";
+import { forwardRef, Ref, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Control, FieldValues, Path } from "react-hook-form";
 
@@ -22,6 +22,9 @@ import {
 import { createBrowserClient } from "@/lib/supabase/client";
 import { fetchCategoriesDropdown } from "@/services/categories";
 import FetchDropdownContainer from "@/components/shared/FetchDropdownContainer";
+import { Autocomplete, ICustomersOption } from "@/components/ui/auto-complete";
+import { fetchCustomers } from "@/services/customers";
+import { FetchCustomersResponse } from "@/services/customers/types";
 
 type FormCategoryInputProps<TFormData extends FieldValues> = {
   control: Control<TFormData>;
@@ -30,21 +33,42 @@ type FormCategoryInputProps<TFormData extends FieldValues> = {
   container?: HTMLDivElement;
 };
 
-const FormCategoryInput = forwardRef(function FormCategoryInputRender<
+const FormCustomerInput = forwardRef(function FormCategoryInputRender<
   TFormData extends FieldValues,
 >(
   { control, name, label, container }: FormCategoryInputProps<TFormData>,
   ref: Ref<HTMLButtonElement>,
 ) {
+  const [searchInput, setSearchInput] = useState<string>("");
+
   const {
-    data: categories,
+    data: customers,
     isLoading,
     isError,
   } = useQuery({
     queryKey: ["customers", "dropdown"],
-    queryFn: () => fetchCategoriesDropdown(createBrowserClient() as any),
+    queryFn: () =>
+      fetchCustomers(createBrowserClient() as any, { search: searchInput }),
     staleTime: 5 * 60 * 1000,
   });
+
+  const mapperCustomers = (
+    customers: FetchCustomersResponse,
+  ): ICustomersOption[] => {
+    return customers.data.map((data) => ({ label: data.name, value: data.id }));
+  };
+
+  const getOptions = () => {
+    if (!isLoading && !isError && customers) {
+      return mapperCustomers(customers);
+    }
+
+    return [];
+  };
+
+  const onSearchChange = (value: string) => {
+    setSearchInput(value);
+  };
 
   return (
     <FormField
@@ -57,37 +81,20 @@ const FormCategoryInput = forwardRef(function FormCategoryInputRender<
           </FormLabel>
 
           <div className="space-y-2 w-full">
-            <Select
-              value={field.value}
-              onValueChange={(value) => field.onChange(value)}
+            <FetchDropdownContainer
+              isLoading={isLoading}
+              isError={isError}
+              errorMessage="Failed to load categories"
             >
-              <FormControl>
-                <SelectTrigger ref={ref} className="md:basis-1/5">
-                  <SelectValue placeholder="Category" />
-                </SelectTrigger>
-              </FormControl>
-
-              <SelectContent portalContainer={container}>
-                <FetchDropdownContainer
-                  isLoading={isLoading}
-                  isError={isError}
-                  errorMessage="Failed to load categories"
-                >
-                  <SelectItem key="all" value="all">
-                    All Categories
-                  </SelectItem>
-
-                  {!isLoading &&
-                    !isError &&
-                    categories &&
-                    categories!.map((category) => (
-                      <SelectItem key={category.id} value={category.id}>
-                        {category.name}
-                      </SelectItem>
-                    ))}
-                </FetchDropdownContainer>
-              </SelectContent>
-            </Select>
+              <Autocomplete
+                onSearchChange={onSearchChange}
+                options={getOptions()}
+                onChange={field.onChange}
+                placeholder="Searching customer ..."
+                value={field.value}
+                search={searchInput}
+              />
+            </FetchDropdownContainer>
 
             <FormMessage />
           </div>
@@ -99,4 +106,4 @@ const FormCategoryInput = forwardRef(function FormCategoryInputRender<
   props: FormCategoryInputProps<TFormData> & { ref?: Ref<HTMLButtonElement> },
 ) => React.ReactElement;
 
-export default FormCategoryInput;
+export default FormCustomerInput;

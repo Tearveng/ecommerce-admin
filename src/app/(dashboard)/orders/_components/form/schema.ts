@@ -31,7 +31,12 @@ export const orderFormSchema = z.object({
   customer: z.string().min(1, { message: "Customer is required" }),
   coupon: z.string(),
   paymentMethod: z.string(),
-  shipping: z.string(),
+  shipping: z.coerce
+    .number({
+      invalid_type_error: "Shipping cost must be a number",
+    })
+    .int({ message: "Shipping cost must be a whole number" })
+    .min(0, { message: "Shipping cost cannot be negative" }),
   status: z.string(),
 });
 // .superRefine((data, ctx) => {

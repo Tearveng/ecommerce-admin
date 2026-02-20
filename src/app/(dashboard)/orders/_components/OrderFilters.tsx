@@ -24,6 +24,7 @@ import { useAuthorization } from "@/hooks/use-authorization";
 import ProductFormSheet from "../../products/_components/form/ProductFormSheet";
 import { SheetTrigger } from "@/components/ui/sheet";
 import { addProduct } from "@/actions/products/addProduct";
+import OrderActions from "./OrderActions";
 
 export default function OrderFilters() {
   const { hasPermission } = useAuthorization();
@@ -149,25 +150,7 @@ export default function OrderFilters() {
               )}
             </Button>
 
-            {hasPermission("products", "canCreate") && (
-              <ProductFormSheet
-                title="Add Product"
-                description="Add necessary product information here"
-                submitButtonText="Add Product"
-                actionVerb="added"
-                action={addProduct}
-              >
-                <SheetTrigger asChild>
-                  <Button
-                    variant="default"
-                    size="lg"
-                    className="h-12 flex-grow"
-                  >
-                    <Plus className="mr-2 size-4" /> Make Order
-                  </Button>
-                </SheetTrigger>
-              </ProductFormSheet>
-            )}
+            <OrderActions />
           </div>
         </div>
 
